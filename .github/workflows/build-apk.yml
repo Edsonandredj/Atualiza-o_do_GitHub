@@ -23,6 +23,7 @@ jobs:
       uses: gradle/actions/setup-gradle@v3
       with:
         gradle-version: '8.7'
+        cache: false  # <--- Adicione esta linha para desativar o cache e sumir com os avisos
 
     - name: Build Debug APK
       run: gradle assembleDebug
