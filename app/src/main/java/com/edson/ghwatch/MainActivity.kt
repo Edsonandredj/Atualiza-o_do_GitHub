@@ -76,7 +76,7 @@ fun Screen() {
 
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.statusBarsPadding().navigationBarsPadding().padding(16.dp)) {
-            Text("GitHub Watch", style = MaterialTheme.typography.headlineMedium)
+            Text("Atualização GitHub", style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(16.dp))
 
             OutlinedTextField(
