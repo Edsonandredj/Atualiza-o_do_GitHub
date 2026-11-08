@@ -3,6 +3,7 @@ package com.edson.ghwatch
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -22,7 +23,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 private val Dark = darkColorScheme(
     primary = Color(0xFF58A6FF),
@@ -56,6 +59,34 @@ fun Screen() {
     var toDelete by remember { mutableStateOf<Repo?>(null) }
 
     val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri != null) {
+            val msg = try {
+                Backup.export(ctx, uri); "Backup salvo"
+            } catch (e: Exception) {
+                "Erro ao salvar o backup"
+            }
+            Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+        }
+    }
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            val msg = try {
+                val n = Backup.import(ctx, uri)
+                repos = Store.repos(ctx)
+                interval = Store.intervalMinutes(ctx)
+                "Backup restaurado: $n repositório(s) adicionado(s)"
+            } catch (e: Exception) {
+                "Arquivo de backup inválido"
+            }
+            Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+        }
+    }
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= 33) permLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
@@ -120,6 +151,21 @@ fun Screen() {
                 onClick = { Store.setToken(ctx, token); tokenSaved = true },
                 modifier = Modifier.fillMaxWidth()
             ) { Text(if (token.isBlank()) "Remover token" else "Salvar token") }
+
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = {
+                        val name = SimpleDateFormat("yy-MM-dd", Locale.getDefault()).format(Date()) + ".json"
+                        exportLauncher.launch(name)
+                    },
+                    modifier = Modifier.weight(1f)
+                ) { Text("Fazer backup") }
+                OutlinedButton(
+                    onClick = { importLauncher.launch(arrayOf("*/*")) },
+                    modifier = Modifier.weight(1f)
+                ) { Text("Restaurar") }
+            }
 
             toDelete?.let { r ->
                 AlertDialog(
