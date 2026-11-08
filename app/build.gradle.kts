@@ -3,6 +3,9 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+// Número do build: o GitHub Actions incrementa sozinho a cada execução
+val runNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
+
 android {
     namespace = "com.edson.ghwatch"
     compileSdk = 34
@@ -11,8 +14,8 @@ android {
         applicationId = "com.edson.ghwatch"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = runNumber
+        versionName = "1.0.$runNumber"
     }
     signingConfigs {
         getByName("debug") {
