@@ -38,4 +38,3 @@ class UpdateWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx
         return Result.success()
     }
 }
-
