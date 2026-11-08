@@ -54,6 +54,9 @@ fun Screen() {
     var error by remember { mutableStateOf<String?>(null) }
     var interval by remember { mutableStateOf(Store.intervalMinutes(ctx)) }
     var busy by remember { mutableStateOf(false) }
+    val version = remember {
+        try { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName ?: "" } catch (e: Exception) { "" }
+    }
     var token by remember { mutableStateOf(Store.token(ctx)) }
     var tokenSaved by remember { mutableStateOf(false) }
     var toDelete by remember { mutableStateOf<Repo?>(null) }
@@ -108,6 +111,7 @@ fun Screen() {
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(Modifier.statusBarsPadding().navigationBarsPadding().padding(16.dp)) {
             Text("Atualização GitHub", style = MaterialTheme.typography.headlineMedium)
+            Text("Versão $version", style = MaterialTheme.typography.bodySmall)
             Spacer(Modifier.height(16.dp))
 
             OutlinedTextField(
